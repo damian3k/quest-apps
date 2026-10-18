@@ -2,8 +2,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="using:QuestApps"
         x:Class="QuestApps.MainWindow"
-        Title="Quest Apps 4.0 — what's on my headset"
-        Width="980" Height="800" WindowStartupLocation="CenterScreen"
+        Title="Quest Apps — what's on my headset"
+        Width="1240" MinWidth="1100" Height="800" MinHeight="560" WindowStartupLocation="CenterScreen"
         DragDrop.AllowDrop="True">
     <Window.Styles>
         <Style Selector="Border.row">
@@ -89,7 +89,9 @@
                     <Button x:Name="WifiBtn" Content="Enable Wi-Fi" IsEnabled="False"
                             ToolTip.Tip="Turn on Wi-Fi ADB (needs the cable once after every headset restart); afterwards the cable can be unplugged"/>
                 </StackPanel>
-                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="10">
+                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="10" Margin="12,0,0,0">
+                    <ToggleButton x:Name="MtpBtn" Content="MTP" IsEnabled="False" VerticalAlignment="Center"
+                                  ToolTip.Tip="MTP (Media Transfer Protocol): switch USB to MTP so file explorers on your computer can browse the headset. Turning off returns USB to ADB-only."/>
                     <CheckBox x:Name="AwakeCheck" Content="Keep awake" IsEnabled="False" VerticalAlignment="Center"
                               ToolTip.Tip="Ignore the proximity sensor: the headset stays on when taken off, so Wi-Fi ADB and kiosk apps keep running. Uses more battery; a headset restart turns it off."/>
                     <ComboBox x:Name="SortBox" SelectedIndex="0" MinWidth="120" VerticalAlignment="Center">
@@ -103,7 +105,7 @@
 
         <StackPanel Grid.Row="1" Spacing="6" Margin="0,12,0,0">
             <Grid ColumnDefinitions="*,Auto">
-                <TextBlock x:Name="StorageSummary" FontWeight="SemiBold" Text="—"/>
+                <TextBlock x:Name="StorageSummary" FontWeight="SemiBold" Text="—" TextTrimming="CharacterEllipsis" Margin="0,0,12,0"/>
                 <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="12"
                             VerticalAlignment="Center">
                     <TextBlock FontSize="11" Classes="muted">
@@ -127,8 +129,11 @@
         <TabControl x:Name="Tabs" Grid.Row="2" Margin="0,14,0,0">
             <TabItem Header="Store — official">
                 <DockPanel>
-                    <TextBlock x:Name="StoreSummary" DockPanel.Dock="Top" FontWeight="SemiBold"
-                               Margin="2,10,0,8" Text="—"/>
+                    <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="2,8,16,8">
+                        <TextBlock x:Name="StoreSummary" FontWeight="SemiBold" VerticalAlignment="Center" Text="—"/>
+                        <TextBox x:Name="StoreSearch" Grid.Column="1" Classes="clearButton" Width="280"
+                                 Watermark="Search by name…"/>
+                    </Grid>
                     <ScrollViewer>
                         <ItemsControl x:Name="StoreList">
                             <ItemsControl.ItemTemplate>
@@ -181,8 +186,11 @@
             </TabItem>
             <TabItem Header="Sideloaded — unknown sources">
                 <DockPanel>
-                    <TextBlock x:Name="SideSummary" DockPanel.Dock="Top" FontWeight="SemiBold"
-                               Margin="2,10,0,8" Text="—"/>
+                    <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="2,8,16,8">
+                        <TextBlock x:Name="SideSummary" FontWeight="SemiBold" VerticalAlignment="Center" Text="—"/>
+                        <TextBox x:Name="SideSearch" Grid.Column="1" Classes="clearButton" Width="280"
+                                 Watermark="Search by name…"/>
+                    </Grid>
                     <ScrollViewer>
                         <ItemsControl x:Name="SideList">
                             <ItemsControl.ItemTemplate>

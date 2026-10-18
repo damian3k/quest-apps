@@ -1,4 +1,4 @@
-# Quest Apps 4.0
+# Quest Apps 4.1
 
 **[English](#english) · [Polski](#polski)**
 
@@ -29,8 +29,8 @@ Quest Apps is a desktop tool (Windows, macOS, Linux) for Meta Quest headsets (te
 #### Installing on macOS
 
 1. Unzip the right file:
-   - `QuestApps-4.0-macos-arm64.zip` for Apple Silicon (M1–M4),
-   - `QuestApps-4.0-macos-x64.zip` for Intel Macs.
+   - `QuestApps-4.1-macos-arm64.zip` for Apple Silicon (M1–M4),
+   - `QuestApps-4.1-macos-x64.zip` for Intel Macs.
 2. Move `QuestApps.app` to **Applications**.
 3. Install adb with Homebrew: `brew install --cask android-platform-tools`. Android Studio's adb works too.
 4. The app is not signed by an Apple developer, so before the **first** start run this once in Terminal. The second line is required on Apple Silicon; without it the app is closed straight away.
@@ -42,7 +42,7 @@ Quest Apps is a desktop tool (Windows, macOS, Linux) for Meta Quest headsets (te
 
 #### Installing on Linux
 
-1. Unpack: `tar xzf QuestApps-4.0-linux-x64.tar.gz` (the `-linux-arm64` file is for ARM boards).
+1. Unpack: `tar xzf QuestApps-4.1-linux-x64.tar.gz` (the `-linux-arm64` file is for ARM boards).
 2. Install adb:
    - Debian/Ubuntu: `sudo apt install adb`
    - Fedora: `sudo dnf install android-tools`
@@ -90,6 +90,7 @@ The headset is now remembered: its name, model and Wi-Fi address are saved on th
 | **Find on Wi-Fi** | Searches the local network for headsets with Wi-Fi ADB on. |
 | **Multi-headset…** | Opens the window for controlling many headsets at once (see section 6). |
 | **Enable Wi-Fi / Disconnect Wi-Fi** | Turns Wi-Fi ADB on for a headset connected by cable, or drops the Wi-Fi connection. |
+| **MTP** | Switches USB to MTP (Media Transfer Protocol), so file explorers on your computer can browse the headset over the cable. Turning it off returns USB to ADB only. ADB keeps working in both modes. On macOS, browsing MTP needs an app such as OpenMTP or Android File Transfer; on Linux, most file managers open MTP devices directly. |
 | **Keep awake** | The headset stays on when it is taken off. A headset restart turns this off again. |
 | **Sort** | Sorts apps by size or by name. |
 
@@ -97,7 +98,7 @@ The headset is now remembered: its name, model and Wi-Fi address are saved on th
 
 **Tabs**
 
-- **Store — official / Sideloaded — unknown sources.** Every app with its icon, version, size and source. Each row has buttons:
+- **Store — official / Sideloaded — unknown sources.** Every app with its icon, version, size and source. The search box above the list filters it by app name or package name. Each row has buttons:
   - **Launch** starts the app in the headset. While the app runs, the row shows *● running*, and the buttons change to **Stop** and **Lock**.
   - **Lock** turns on kiosk mode (see section 5). **Unlock** ends it.
   - **Uninstall** removes the app and its data, after asking first.
@@ -207,8 +208,8 @@ Quest Apps to program na komputer (Windows, macOS, Linux) do gogli Meta Quest (t
 #### Instalacja na macOS
 
 1. Rozpakuj właściwy plik:
-   - `QuestApps-4.0-macos-arm64.zip` dla Apple Silicon (M1–M4),
-   - `QuestApps-4.0-macos-x64.zip` dla Maców z procesorem Intel.
+   - `QuestApps-4.1-macos-arm64.zip` dla Apple Silicon (M1–M4),
+   - `QuestApps-4.1-macos-x64.zip` dla Maców z procesorem Intel.
 2. Przenieś `QuestApps.app` do **Aplikacji**.
 3. Zainstaluj adb przez Homebrew: `brew install --cask android-platform-tools`. Działa też adb z Android Studio.
 4. Aplikacja nie jest podpisana przez dewelopera Apple, więc przed **pierwszym** uruchomieniem wpisz raz w Terminalu poniższe polecenia. Druga linia jest wymagana na Apple Silicon; bez niej aplikacja od razu się zamyka.
@@ -220,7 +221,7 @@ Quest Apps to program na komputer (Windows, macOS, Linux) do gogli Meta Quest (t
 
 #### Instalacja na Linuksie
 
-1. Rozpakuj: `tar xzf QuestApps-4.0-linux-x64.tar.gz` (plik `-linux-arm64` jest dla płytek ARM).
+1. Rozpakuj: `tar xzf QuestApps-4.1-linux-x64.tar.gz` (plik `-linux-arm64` jest dla płytek ARM).
 2. Zainstaluj adb:
    - Debian/Ubuntu: `sudo apt install adb`
    - Fedora: `sudo dnf install android-tools`
@@ -268,6 +269,7 @@ Gogle są teraz zapamiętane: ich nazwa, model i adres Wi-Fi są zapisane na kom
 | **Find on Wi-Fi** | Przeszukuje sieć lokalną w poszukiwaniu gogli z włączonym Wi-Fi ADB. |
 | **Multi-headset…** | Otwiera okno do sterowania wieloma goglami naraz (punkt 6). |
 | **Enable Wi-Fi / Disconnect Wi-Fi** | Włącza Wi-Fi ADB dla gogli podłączonych kablem albo rozłącza połączenie Wi-Fi. |
+| **MTP** | Przełącza USB w tryb MTP (Media Transfer Protocol), dzięki czemu eksplorator plików na komputerze widzi pamięć gogli przez kabel. Wyłączenie przywraca USB do trybu „tylko ADB”. ADB działa w obu trybach. Na macOS do przeglądania MTP potrzebna jest aplikacja, np. OpenMTP albo Android File Transfer; na Linuksie większość menedżerów plików otwiera urządzenia MTP bezpośrednio. |
 | **Keep awake** | Gogle nie zasypiają po zdjęciu z głowy. Restart gogli wyłącza tę opcję. |
 | **Sort** | Sortuje aplikacje według rozmiaru albo nazwy. |
 
@@ -275,7 +277,7 @@ Gogle są teraz zapamiętane: ich nazwa, model i adres Wi-Fi są zapisane na kom
 
 **Zakładki**
 
-- **Store — official / Sideloaded — unknown sources.** Wszystkie aplikacje z ikoną, wersją, rozmiarem i źródłem. W każdym wierszu są przyciski:
+- **Store — official / Sideloaded — unknown sources.** Wszystkie aplikacje z ikoną, wersją, rozmiarem i źródłem. Pole wyszukiwania nad listą filtruje ją po nazwie aplikacji albo pakietu. W każdym wierszu są przyciski:
   - **Launch** uruchamia aplikację w goglach. Gdy aplikacja działa, wiersz pokazuje *● running*, a przyciski zmieniają się na **Stop** i **Lock**.
   - **Lock** włącza tryb kiosku (punkt 5). **Unlock** go wyłącza.
   - **Uninstall** usuwa aplikację razem z jej danymi, po potwierdzeniu.

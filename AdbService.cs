@@ -713,6 +713,14 @@ public sealed class AdbService
     public bool GetKeepAwake() =>
         Run("shell dumpsys vrpowermanager").Contains("Virtual proximity state: CLOSE", StringComparison.Ordinal);
 
+    // USB file transfer: MTP lets file explorers on the computer browse the headset storage.
+    // A blank function returns USB to charging + ADB only. ADB stays connected either way.
+    // (sys.usb.config keeps saying "adb" on Quest — only getFunctions shows "mtp".)
+    public void SetMtp(bool on) => Run(on ? "shell svc usb setFunctions mtp" : "shell svc usb setFunctions");
+
+    public bool GetMtp() =>
+        Run("shell svc usb getFunctions 2>&1").Contains("mtp", StringComparison.Ordinal);
+
     // ---- launching ----
 
     // Starts the app's launcher activity. Returns null on success or a reason.

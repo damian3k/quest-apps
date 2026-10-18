@@ -55,6 +55,9 @@ public partial class MainWindow : Window
     public MainWindow(string[] args)
     {
         InitializeComponent();
+        var version = typeof(MainWindow).Assembly.GetName().Version;
+        if (version != null)
+            Title = $"Quest Apps {version.Major}.{version.Minor} — what's on my headset";
         Icon = new WindowIcon(Avalonia.Platform.AssetLoader.Open(
             new Uri("avares://QuestApps/icon256.png")));
         RefreshBtn.Click += async (_, _) => await RefreshAsync();
@@ -62,8 +65,11 @@ public partial class MainWindow : Window
         FleetBtn.Click += (_, _) => OpenFleet();
         ScanBtn.Click += async (_, _) => await ScanNetworkAsync();
         AwakeCheck.Click += async (_, _) => await ToggleKeepAwakeAsync();
+        MtpBtn.Click += async (_, _) => await ToggleMtpAsync();
         DeviceBox.SelectionChanged += async (_, _) => await OnDeviceSelectedAsync();
         SortBox.SelectionChanged += (_, _) => Populate();
+        StoreSearch.TextChanged += (_, _) => Populate();
+        SideSearch.TextChanged += (_, _) => Populate();
         Loaded += (_, _) => _ = InitAsync();
         Closing += OnWindowClosing;
         _poll.Tick += async (_, _) => await PollAsync();
@@ -150,6 +156,7 @@ public partial class MainWindow : Window
                 KioskRegistry.Adopt(_adb, h.Id, h.Serial, h.Ip, lockInfo.Package);
             await RefreshRunningAsync();
             AwakeCheck.IsChecked = await Task.Run(_adb.GetKeepAwake);
+            MtpBtn.IsChecked = await Task.Run(_adb.GetMtp);
 
             var store = apps.Count(a => a.IsStore);
             SetStatus($"{Describe(h)} — {apps.Count} apps: {store} from the store, " +
@@ -315,6 +322,7 @@ public partial class MainWindow : Window
             WifiBtn.IsEnabled = idle && h?.Ip != null;
         }
         AwakeCheck.IsEnabled = h?.IsConnected == true;
+        MtpBtn.IsEnabled = h?.IsConnected == true;
     }
 
     // ---- Wi-Fi ADB ----
@@ -444,6 +452,42 @@ public partial class MainWindow : Window
         {
             AwakeCheck.IsChecked = !on;
             SetStatus("Keep awake error: " + ex.Message, ErrBrush);
+        }
+    }
+
+    private async Task ToggleMtpAsync()
+    {
+        bool on = MtpBtn.IsChecked == true;
+        var h = await EnsureConnectedAsync();
+        if (h == null)
+        {
+            MtpBtn.IsChecked = !on;
+            return;
+        }
+        MtpBtn.IsEnabled = false;
+        try
+        {
+            await Task.Run(() => _adb.SetMtp(on));
+            var now = await Task.Run(_adb.GetMtp);
+            MtpBtn.IsChecked = now;
+            if (now != on)
+                SetStatus(on ? "The headset did not switch USB to MTP." : "The headset is still in MTP mode.", WarnBrush);
+            else if (on)
+                SetStatus(h.UsbSerial != null
+                    ? "MTP on — the headset now shows up in your computer's file explorer (USB). " +
+                      "Put the headset on and allow file access if it asks."
+                    : "MTP on — connect the USB cable to browse the headset in your computer's file explorer.", OkBrush);
+            else
+                SetStatus("MTP off — USB is back to ADB only.", OkBrush);
+        }
+        catch (Exception ex)
+        {
+            MtpBtn.IsChecked = !on;
+            SetStatus("MTP error: " + ex.Message, ErrBrush);
+        }
+        finally
+        {
+            MtpBtn.IsEnabled = SelectedHeadset?.IsConnected == true;
         }
     }
 
@@ -804,10 +848,12 @@ public partial class MainWindow : Window
 
         var store = apps.Where(a => a.IsStore).ToList();
         var side = apps.Where(a => !a.IsStore).ToList();
-        StoreList.ItemsSource = store;
-        SideList.ItemsSource = side;
-        StoreSummary.Text = store.Count > 0 ? $"{store.Count} apps • {Fmt(FmtTotal(store))} total" : "—";
-        SideSummary.Text = side.Count > 0 ? $"{side.Count} apps • {Fmt(FmtTotal(side))} total" : "—";
+        var storeShown = Search(store, StoreSearch.Text);
+        var sideShown = Search(side, SideSearch.Text);
+        StoreList.ItemsSource = storeShown;
+        SideList.ItemsSource = sideShown;
+        StoreSummary.Text = ListSummary(store, storeShown);
+        SideSummary.Text = ListSummary(side, sideShown);
 
         ApplyRunState();
         Bar.Apps = apps;
@@ -1177,6 +1223,27 @@ public partial class MainWindow : Window
             item.SetFailed("Error: " + ex.Message);
             return false;
         }
+    }
+
+    // Search box: matches the app name or the package name, case-insensitive.
+    private static List<QuestApp> Search(List<QuestApp> list, string? query)
+    {
+        var q = query?.Trim();
+        if (string.IsNullOrEmpty(q))
+            return list;
+        return list.Where(a => a.DisplayName.Contains(q, StringComparison.OrdinalIgnoreCase) ||
+                               a.Package.Contains(q, StringComparison.OrdinalIgnoreCase)).ToList();
+    }
+
+    private static string ListSummary(List<QuestApp> all, List<QuestApp> shown)
+    {
+        if (all.Count == 0)
+            return "—";
+        if (shown.Count == all.Count)
+            return $"{all.Count} apps • {Fmt(FmtTotal(all))} total";
+        return shown.Count == 0
+            ? $"No matches • {all.Count} apps in total"
+            : $"{shown.Count} of {all.Count} apps • {Fmt(FmtTotal(shown))}";
     }
 
     private static long FmtTotal(List<QuestApp> list) =>

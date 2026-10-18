@@ -1,6 +1,6 @@
 <p align="center"><img src="icon256.png" width="128" height="128" alt="Quest Apps icon"></p>
 
-# Quest Apps 4.0
+# Quest Apps 4.1
 
 **[English](#english) · [Polski](#polski)**
 
@@ -10,11 +10,11 @@
 
 | Platform | File | Guide / Instrukcja |
 |---|---|---|
-| Windows 10/11 x64 | `QuestApps_4.0-windows-x64.zip` (adb included / adb w zestawie) | this file / ten plik |
-| macOS 12+ Apple Silicon | `QuestApps-4.0-macos-arm64.zip` | [README-multiplatform.md](README-multiplatform.md) |
-| macOS 12+ Intel | `QuestApps-4.0-macos-x64.zip` | [README-multiplatform.md](README-multiplatform.md) |
-| Linux x64 | `QuestApps-4.0-linux-x64.tar.gz` | [README-multiplatform.md](README-multiplatform.md) |
-| Linux ARM64 | `QuestApps-4.0-linux-arm64.tar.gz` | [README-multiplatform.md](README-multiplatform.md) |
+| Windows 10/11 x64 | `QuestApps_4.1-windows-x64.zip` (adb included / adb w zestawie) | this file / ten plik |
+| macOS 12+ Apple Silicon | `QuestApps-4.1-macos-arm64.zip` | [README-multiplatform.md](README-multiplatform.md) |
+| macOS 12+ Intel | `QuestApps-4.1-macos-x64.zip` | [README-multiplatform.md](README-multiplatform.md) |
+| Linux x64 | `QuestApps-4.1-linux-x64.tar.gz` | [README-multiplatform.md](README-multiplatform.md) |
+| Linux ARM64 | `QuestApps-4.1-linux-arm64.tar.gz` | [README-multiplatform.md](README-multiplatform.md) |
 
 Each package includes its own guide. / Każda paczka zawiera własną instrukcję.
 
@@ -77,6 +77,7 @@ The headset is now remembered: its name, model and Wi-Fi address are saved on th
 | **Find on Wi-Fi** | Searches the local network for headsets with Wi-Fi ADB on. |
 | **Multi-headset…** | Opens the window for controlling many headsets at once (see section 6). |
 | **Enable Wi-Fi / Disconnect Wi-Fi** | Turns Wi-Fi ADB on for a headset connected by cable, or drops the Wi-Fi connection. |
+| **MTP** | Switches USB to MTP (Media Transfer Protocol), so file explorers on your computer can browse the headset over the cable. Turning it off returns USB to ADB only. ADB keeps working in both modes. |
 | **Keep awake** | The headset stays on when it is taken off. A headset restart turns this off again. |
 | **Sort** | Sorts apps by size or by name. |
 
@@ -84,7 +85,7 @@ The headset is now remembered: its name, model and Wi-Fi address are saved on th
 
 **Tabs**
 
-- **Store — official / Sideloaded — unknown sources.** Every app with its icon, version, size and source. Each row has buttons:
+- **Store — official / Sideloaded — unknown sources.** Every app with its icon, version, size and source. The search box above the list filters it by app name or package name. Each row has buttons:
   - **Launch** starts the app in the headset. While the app runs, the row shows *● running*, and the buttons change to **Stop** and **Lock**.
   - **Lock** turns on kiosk mode (see section 5). **Unlock** ends it.
   - **Uninstall** removes the app and its data, after asking first.
@@ -219,6 +220,7 @@ Gogle są teraz zapamiętane: ich nazwa, model i adres Wi-Fi są zapisane na kom
 | **Find on Wi-Fi** | Przeszukuje sieć lokalną w poszukiwaniu gogli z włączonym Wi-Fi ADB. |
 | **Multi-headset…** | Otwiera okno do sterowania wieloma goglami naraz (punkt 6). |
 | **Enable Wi-Fi / Disconnect Wi-Fi** | Włącza Wi-Fi ADB dla gogli podłączonych kablem albo rozłącza połączenie Wi-Fi. |
+| **MTP** | Przełącza USB w tryb MTP (Media Transfer Protocol), dzięki czemu eksplorator plików na komputerze widzi pamięć gogli przez kabel. Wyłączenie przywraca USB do trybu „tylko ADB”. ADB działa w obu trybach. |
 | **Keep awake** | Gogle nie zasypiają po zdjęciu z głowy. Restart gogli wyłącza tę opcję. |
 | **Sort** | Sortuje aplikacje według rozmiaru albo nazwy. |
 
@@ -226,7 +228,7 @@ Gogle są teraz zapamiętane: ich nazwa, model i adres Wi-Fi są zapisane na kom
 
 **Zakładki**
 
-- **Store — official / Sideloaded — unknown sources.** Wszystkie aplikacje z ikoną, wersją, rozmiarem i źródłem. W każdym wierszu są przyciski:
+- **Store — official / Sideloaded — unknown sources.** Wszystkie aplikacje z ikoną, wersją, rozmiarem i źródłem. Pole wyszukiwania nad listą filtruje ją po nazwie aplikacji albo pakietu. W każdym wierszu są przyciski:
   - **Launch** uruchamia aplikację w goglach. Gdy aplikacja działa, wiersz pokazuje *● running*, a przyciski zmieniają się na **Stop** i **Lock**.
   - **Lock** włącza tryb kiosku (punkt 5). **Unlock** go wyłącza.
   - **Uninstall** usuwa aplikację razem z jej danymi, po potwierdzeniu.
