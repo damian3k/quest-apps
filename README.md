@@ -1,3 +1,5 @@
+<p align="center"><img src="icon256.png" width="128" height="128" alt="Quest Apps icon"></p>
+
 # Quest Apps 4.0
 
 **[English](#english) · [Polski](#polski)**
