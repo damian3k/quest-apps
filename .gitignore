@@ -1,0 +1,25 @@
+# --- .NET / Avalonia ---
+bin/
+obj/
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+*.rsuser
+# --- Python (tools/) ---
+__pycache__/
+*.pyc
+# --- wspólne (POLICY.md §3) ---
+.env
+.env.*
+!.env.example
+*.log
+tmp/
+dist/
+.DS_Store
+Thumbs.db
+# --- adb (Google Platform-Tools): not in the repo, see NOTICE.md ---
+adb/
+adb-macos/
+adb-linux/

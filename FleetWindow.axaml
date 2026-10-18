@@ -1,0 +1,170 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="using:QuestApps"
+        x:Class="QuestApps.FleetWindow"
+        Title="Quest Apps — multi-headset"
+        Width="1180" Height="760" MinWidth="900" MinHeight="520"
+        WindowStartupLocation="CenterOwner">
+    <Window.Styles>
+        <Style Selector="Border.row">
+            <Setter Property="Margin" Value="0,0,0,6"/>
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Background" Value="#FF1B1C26"/>
+            <Setter Property="BorderBrush" Value="#FF2A2C3E"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+        <Style Selector="Border.panel">
+            <Setter Property="Padding" Value="12"/>
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="Background" Value="#FF14151E"/>
+            <Setter Property="BorderBrush" Value="#FF2A2C3E"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+        <Style Selector="TextBlock.muted">
+            <Setter Property="Foreground" Value="#FF8B8CA0"/>
+        </Style>
+        <Style Selector="TextBlock.heading">
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+        <Style Selector="Button">
+            <Setter Property="Padding" Value="14,7"/>
+        </Style>
+        <Style Selector="Button.launch">
+            <Setter Property="Background" Value="#FF23324A"/>
+            <Setter Property="Foreground" Value="#FFB9D3FF"/>
+            <Setter Property="BorderBrush" Value="#FF3B5A8C"/>
+        </Style>
+        <Style Selector="Button.lock">
+            <Setter Property="Background" Value="#FF3A3220"/>
+            <Setter Property="Foreground" Value="#FFFFD98A"/>
+            <Setter Property="BorderBrush" Value="#FF7A6233"/>
+        </Style>
+        <Style Selector="Button.stop">
+            <Setter Property="Background" Value="#FF3B2431"/>
+            <Setter Property="Foreground" Value="#FFFFB9C4"/>
+            <Setter Property="BorderBrush" Value="#FF6E3B4C"/>
+        </Style>
+        <Style Selector="TextBox.name">
+            <Setter Property="MinWidth" Value="150"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="6,3"/>
+            <Setter Property="MinHeight" Value="28"/>
+        </Style>
+        <Style Selector="ScrollViewer">
+            <Setter Property="Padding" Value="0,0,14,0"/>
+        </Style>
+        <Style Selector="ListBoxItem">
+            <Setter Property="Padding" Value="8,6"/>
+            <Setter Property="CornerRadius" Value="6"/>
+        </Style>
+    </Window.Styles>
+
+    <Grid RowDefinitions="Auto,Auto,*" Margin="16">
+        <StackPanel Orientation="Horizontal" Spacing="8">
+            <Button x:Name="RefreshBtn" Content="Refresh" Classes="accent"/>
+            <Button x:Name="ScanBtn" Content="Find on Wi-Fi"
+                    ToolTip.Tip="Search the local network for headsets with Wi-Fi ADB turned on and connect them"/>
+            <Button x:Name="SelectAllBtn" Content="Select all"/>
+            <Button x:Name="SelectNoneBtn" Content="Select none"/>
+        </StackPanel>
+        <TextBlock x:Name="StatusText" Grid.Row="1" Classes="muted" TextWrapping="Wrap" Margin="2,10,0,10"
+                   Text="Looking for headsets…"/>
+
+        <Grid Grid.Row="2" ColumnDefinitions="5*,12,4*">
+            <!-- headsets -->
+            <Border Classes="panel">
+                <DockPanel>
+                    <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,0,0,10">
+                        <TextBlock x:Name="HeadsetsSummary" Classes="heading" Text="Headsets"/>
+                        <TextBlock Grid.Column="1" Classes="muted" FontSize="11" VerticalAlignment="Center"
+                                   Text="click the name to rename"/>
+                    </Grid>
+                    <ScrollViewer>
+                        <ItemsControl x:Name="HeadsetList">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="local:FleetHeadset">
+                                    <Border Classes="row">
+                                        <Grid ColumnDefinitions="Auto,*,Auto">
+                                            <CheckBox IsChecked="{Binding IsSelected}" IsEnabled="{Binding IsOnline}"
+                                                      VerticalAlignment="Top" Margin="0,2,6,0"/>
+                                            <StackPanel Grid.Column="1" Spacing="3">
+                                                <StackPanel Orientation="Horizontal" Spacing="10">
+                                                    <TextBox Classes="name" Text="{Binding Name}"
+                                                             Watermark="{Binding Label}"
+                                                             LostFocus="OnNameLostFocus" KeyDown="OnNameKeyDown"/>
+                                                    <TextBlock Classes="muted" FontSize="12" VerticalAlignment="Center"
+                                                               Text="{Binding ConnectionText}"/>
+                                                </StackPanel>
+                                                <StackPanel Orientation="Horizontal" Spacing="14">
+                                                    <TextBlock FontSize="12" Text="{Binding NowText}"/>
+                                                    <TextBlock FontSize="12" Foreground="#FFFFD98A"
+                                                               Text="{Binding KioskText}"/>
+                                                </StackPanel>
+                                                <TextBlock FontSize="11" TextWrapping="Wrap"
+                                                           Foreground="{Binding StatusBrush}"
+                                                           Text="{Binding StatusText}"/>
+                                            </StackPanel>
+                                            <TextBlock Grid.Column="2" FontWeight="SemiBold" VerticalAlignment="Top"
+                                                       Margin="8,4,0,0" Text="{Binding BatteryText}"/>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </DockPanel>
+            </Border>
+
+            <!-- apps + actions -->
+            <Border Grid.Column="2" Classes="panel">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top" x:Name="AppsSummary" Classes="heading" Margin="0,0,0,8"
+                               Text="Apps on the selected headsets"/>
+                    <TextBox DockPanel.Dock="Top" x:Name="FilterBox" Watermark="Filter apps…" Margin="0,0,0,8"/>
+
+                    <StackPanel DockPanel.Dock="Bottom" Spacing="8" Margin="0,10,0,0">
+                        <TextBlock x:Name="ChosenText" Classes="muted" TextWrapping="Wrap"
+                                   Text="Pick an app, then start it on every selected headset at once."/>
+                        <WrapPanel Orientation="Horizontal">
+                            <Button x:Name="LaunchBtn" Classes="launch" Content="Launch" Margin="0,0,8,8"
+                                    ToolTip.Tip="Start the app on every selected headset that has it"/>
+                            <Button x:Name="LaunchLockBtn" Classes="lock" Content="Launch &amp; Lock" Margin="0,0,8,8"
+                                    ToolTip.Tip="Start the app and lock it (kiosk) on every selected headset that has it"/>
+                            <Button x:Name="UnlockBtn" Classes="lock" Content="Unlock" Margin="0,0,8,8"
+                                    ToolTip.Tip="End the kiosk on the selected headsets"/>
+                            <Button x:Name="StopBtn" Classes="stop" Content="Stop" Margin="0,0,8,8"
+                                    ToolTip.Tip="Unlock and close the app on the selected headsets"/>
+                        </WrapPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Classes="muted" VerticalAlignment="Center" Text="Keep awake:"/>
+                            <Button x:Name="AwakeOnBtn" Content="On"
+                                    ToolTip.Tip="Selected headsets stay on when taken off (Wi-Fi ADB and kiosk keep working)"/>
+                            <Button x:Name="AwakeOffBtn" Content="Off"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <ListBox x:Name="AppList" SelectionMode="Single" Background="Transparent">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate DataType="local:FleetApp">
+                                <Grid ColumnDefinitions="Auto,*,Auto">
+                                    <Image Source="{Binding Icon}" Width="34" Height="34" Margin="0,0,10,0"/>
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1">
+                                        <TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold"
+                                                   TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Text="{Binding Package}" Classes="muted" FontSize="11"
+                                                   TextTrimming="CharacterEllipsis"/>
+                                    </StackPanel>
+                                    <TextBlock Grid.Column="2" FontSize="11" VerticalAlignment="Center"
+                                               Margin="8,0,0,0" Foreground="{Binding CountBrush}"
+                                               Text="{Binding CountText}"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </DockPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>
