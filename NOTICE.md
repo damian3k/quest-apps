@@ -12,13 +12,17 @@ Quest Apps is built with [Avalonia UI](https://github.com/AvaloniaUI/Avalonia) a
 The Windows release package contains `adb\adb.exe`, `adb\AdbWinApi.dll` and
 `adb\AdbWinUsbApi.dll`: an unmodified copy of Google's
 [Android SDK Platform-Tools](https://developer.android.com/tools/releases/platform-tools)
-(version 35.0.1). These files are Google's work, are not covered by the MIT License
-above, and remain subject to Google's terms. The adb source code is part of the
-Android Open Source Project and is available under the Apache License 2.0.
+(version 35.0.1). They are not covered by the MIT License above. They are built from
+the [Android Open Source Project](https://android.googlesource.com/platform/packages/modules/adb/),
+are licensed under the Apache License 2.0, and are redistributed under that license.
+Copyright © The Android Open Source Project.
+
+The full Apache License 2.0 text and the notices of the components adb is built from
+are in `adb\NOTICE.txt`, copied unchanged from the Platform-Tools package.
 
 The source repository does not contain these files. To build from source on Windows,
-download Platform-Tools from the link above and copy those three files into an
-`adb\` folder next to `QuestApps.csproj`. On macOS and Linux the app uses the adb
+download Platform-Tools from the link above and copy those three files and
+`NOTICE.txt` into an `adb\` folder next to `QuestApps.csproj`. On macOS and Linux the app uses the adb
 installed on the system.
 
 ## Trademarks
