@@ -2,6 +2,8 @@
 
 **[English](#english) · [Polski](#polski)**
 
+![Quest Apps: main window with installed apps, sizes and storage bar](docs/screenshot.png)
+
 **Download / Pobierz:** [Releases](https://github.com/damian3k/quest-apps/releases/latest)
 
 | Platform | File | Guide / Instrukcja |
