@@ -4,18 +4,21 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
+using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 
 namespace QuestApps;
 
 // Several headsets at once: pick headsets, pick an app, then launch / lock / unlock / stop
-// it on all of them in parallel. Kiosks are shared with the main window (KioskRegistry).
+// it on all of them in parallel, or install APKs on all of them.
+// Kiosks are shared with the main window (KioskRegistry).
 public partial class FleetWindow : Window
 {
     private enum Outcome { Ok, Skipped, Failed }
@@ -29,6 +32,7 @@ public partial class FleetWindow : Window
     private bool _polling;
     private bool _busy;
     private int _pollCount;
+    private CancellationTokenSource? _installCts;
 
     public FleetWindow() : this(new AdbService()) { } // designer
 
@@ -51,6 +55,11 @@ public partial class FleetWindow : Window
         StopBtn.Click += async (_, _) => await StopAsync();
         AwakeOnBtn.Click += async (_, _) => await KeepAwakeAsync(true);
         AwakeOffBtn.Click += async (_, _) => await KeepAwakeAsync(false);
+        InstallApkBtn.Click += async (_, _) => await PickAndInstallAsync(folder: false);
+        InstallFolderBtn.Click += async (_, _) => await PickAndInstallAsync(folder: true);
+        CancelInstallBtn.Click += (_, _) => _installCts?.Cancel();
+        AddHandler(DragDrop.DragOverEvent, OnDragOver);
+        AddHandler(DragDrop.DropEvent, OnDrop);
 
         KioskRegistry.Changed += OnKioskChanged;
         KioskRegistry.Status += OnKioskStatus;
@@ -327,6 +336,7 @@ public partial class FleetWindow : Window
         bool any = selected.Count > 0 && !_busy;
         LaunchBtn.IsEnabled = LaunchLockBtn.IsEnabled = StopBtn.IsEnabled = any && app != null;
         UnlockBtn.IsEnabled = AwakeOnBtn.IsEnabled = AwakeOffBtn.IsEnabled = any;
+        InstallApkBtn.IsEnabled = InstallFolderBtn.IsEnabled = any;
 
         if (app == null)
         {
@@ -408,9 +418,10 @@ public partial class FleetWindow : Window
 
     // ---- actions on all selected headsets, in parallel ----
 
-    private async Task RunOnSelectedAsync(string what, Func<FleetHeadset, AdbService, (Outcome, string)> action)
+    private async Task RunOnSelectedAsync(string what, Func<FleetHeadset, AdbService, (Outcome, string)> action,
+        List<FleetHeadset>? only = null)
     {
-        var targets = SelectedOnline();
+        var targets = only ?? SelectedOnline();
         if (targets.Count == 0)
         {
             SetStatus("Select at least one connected headset.", FleetBrushes.Warn);
@@ -527,6 +538,187 @@ public partial class FleetWindow : Window
         adb.SetKeepAwake(on);
         return (Outcome.Ok, on ? "keep awake on — stays on when taken off" : "keep awake off");
     });
+
+    // ---- install APKs (+ OBB) on all selected headsets ----
+
+    private void OnDragOver(object? sender, DragEventArgs e) =>
+        e.DragEffects = e.DataTransfer.Contains(DataFormat.File) && !_busy ? DragDropEffects.Copy : DragDropEffects.None;
+
+    private async void OnDrop(object? sender, DragEventArgs e)
+    {
+        var paths = e.DataTransfer.TryGetFiles()?
+            .Select(f => f.TryGetLocalPath())
+            .OfType<string>()
+            .ToList();
+        if (paths is { Count: > 0 })
+            await InstallOnSelectedAsync(paths);
+    }
+
+    private async Task PickAndInstallAsync(bool folder)
+    {
+        List<string> paths;
+        if (folder)
+        {
+            var folders = await StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
+            {
+                Title = "Choose a folder with APK (and OBB) files",
+                AllowMultiple = true,
+            });
+            paths = folders.Select(f => f.TryGetLocalPath()).OfType<string>().ToList();
+        }
+        else
+        {
+            var files = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+            {
+                Title = "Choose APK files",
+                AllowMultiple = true,
+                FileTypeFilter = new[]
+                {
+                    new FilePickerFileType("Android apps and OBB data") { Patterns = new[] { "*.apk", "*.obb" } },
+                },
+            });
+            paths = files.Select(f => f.TryGetLocalPath()).OfType<string>().ToList();
+        }
+        await InstallOnSelectedAsync(paths);
+    }
+
+    private async Task InstallOnSelectedAsync(List<string> paths)
+    {
+        if (paths.Count == 0 || _busy)
+            return;
+        var targets = SelectedOnline();
+        if (targets.Count == 0)
+        {
+            SetStatus("Select at least one connected headset first.", FleetBrushes.Warn);
+            return;
+        }
+
+        SetStatus("Reading APK files…", FleetBrushes.Info);
+        List<InstallItem> items;
+        List<string> skipped;
+        try
+        {
+            (items, skipped) = await Task.Run(() => InstallScanner.Collect(paths));
+        }
+        catch (Exception ex)
+        {
+            SetStatus("Could not read the files: " + ex.Message, FleetBrushes.Err);
+            return;
+        }
+        if (items.Count == 0)
+        {
+            SetStatus("Nothing to install" + (skipped.Count > 0 ? ": " + string.Join(", ", skipped) : "."),
+                FleetBrushes.Warn);
+            return;
+        }
+
+        var list = string.Join("\n", items.Select(i =>
+            $"• {i.DisplayName} {i.VersionText} — {InstallItem.FmtBytes(i.TotalBytes)}" +
+            (i.ObbFiles.Count > 0 ? $" (with {i.ObbFiles.Count} OBB)" : "")));
+        if (!await ConfirmDialog.AskCustomAsync(this, $"Install on {targets.Count} headset(s)?",
+                $"{list}\n\nOn: {string.Join(", ", targets.Select(h => h.Label))}\n\n" +
+                "Every permission the apps ask for is granted. A headset that already has a newer version, " +
+                "or a copy signed with a different key, is skipped — handle it in the main window." +
+                (skipped.Count > 0 ? $"\n\nIgnored: {string.Join(", ", skipped)}" : ""),
+                "Install"))
+        {
+            SetStatus(Summary(), FleetBrushes.Ok);
+            return;
+        }
+
+        _installCts = new CancellationTokenSource();
+        var ct = _installCts.Token;
+        CancelInstallBtn.IsVisible = true;
+        try
+        {
+            var what = items.Count == 1 ? $"Install {items[0].DisplayName}" : $"Install {items.Count} apps";
+            await RunOnSelectedAsync(what, (h, adb) => InstallItems(h, adb, items, ct), targets);
+        }
+        finally
+        {
+            CancelInstallBtn.IsVisible = false;
+            _installCts.Dispose();
+            _installCts = null;
+        }
+        await LoadPackagesAsync(targets.Where(h => h.IsOnline).ToList());
+        RebuildApps();
+    }
+
+    // Runs off the UI thread, one call per headset; the headsets install in parallel.
+    // Same steps as the main window's queue, minus its questions: downgrades and
+    // different-key copies are reported instead of being replaced on every headset.
+    private static (Outcome, string) InstallItems(FleetHeadset h, AdbService adb, List<InstallItem> items,
+        CancellationToken ct)
+    {
+        var installed = 0;
+        var problems = new List<string>();
+        for (int n = 0; n < items.Count; n++)
+        {
+            var item = items[n];
+            if (ct.IsCancellationRequested)
+            {
+                problems.Add($"{item.DisplayName}: canceled");
+                continue;
+            }
+            var prefix = items.Count > 1 ? $"{n + 1}/{items.Count} {item.DisplayName}" : item.DisplayName;
+            var lastText = "";
+            void Progress(string text)
+            {
+                if (text == lastText)
+                    return;
+                lastText = text;
+                Dispatcher.UIThread.Post(() => h.SetStatus($"{prefix}: {text}", FleetBrushes.Info));
+            }
+            static int Pct(long done, long total) => total <= 0 ? 0 : (int)(done * 100 / total);
+
+            try
+            {
+                Progress("checking free space…");
+                var (totalKb, usedKb) = adb.GetStorage();
+                long freeBytes = (totalKb - usedKb) * 1024;
+                // the APK is staged in /data/local/tmp before install, so it briefly needs twice its size
+                long needBytes = item.ApkBytes * 2 + item.ObbBytes;
+                if (needBytes > freeBytes)
+                {
+                    problems.Add($"{item.DisplayName}: not enough space (needs {InstallItem.FmtBytes(needBytes)}, " +
+                                 $"free {InstallItem.FmtBytes(freeBytes)})");
+                    continue;
+                }
+
+                var result = adb.InstallApk(item.ApkPath, grantAll: true, allowDowngrade: false,
+                    (done, total) => Progress($"uploading APK {Pct(done, total)}%"),
+                    () => Progress("installing (the headset verifies the APK)…"), ct);
+                if (!result.Success)
+                {
+                    problems.Add($"{item.DisplayName}: {InstallScanner.Explain(result.Code, result.Output)}");
+                    continue;
+                }
+
+                long obbDone = 0;
+                foreach (var obb in item.ObbFiles)
+                {
+                    var remote = $"/sdcard/Android/obb/{item.Package}/{Path.GetFileName(obb)}";
+                    long before = obbDone;
+                    adb.Push(obb, remote, (done, _) => Progress($"copying OBB {Pct(before + done, item.ObbBytes)}%"), ct);
+                    obbDone += new FileInfo(obb).Length;
+                }
+                installed++;
+            }
+            catch (OperationCanceledException)
+            {
+                problems.Add($"{item.DisplayName}: canceled");
+            }
+            catch (Exception ex)
+            {
+                problems.Add($"{item.DisplayName}: {ex.Message}");
+            }
+        }
+
+        if (problems.Count == 0)
+            return (Outcome.Ok, items.Count == 1 ? $"{items[0].DisplayName} installed" : $"{installed} apps installed");
+        var message = (installed > 0 ? $"installed {installed} of {items.Count} — " : "") + string.Join("; ", problems);
+        return (installed > 0 ? Outcome.Skipped : Outcome.Failed, message);
+    }
 
     private void SetStatus(string text, IBrush brush)
     {

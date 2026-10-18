@@ -4,7 +4,8 @@
         x:Class="QuestApps.FleetWindow"
         Title="Quest Apps — multi-headset"
         Width="1180" Height="760" MinWidth="900" MinHeight="520"
-        WindowStartupLocation="CenterOwner">
+        WindowStartupLocation="CenterOwner"
+        DragDrop.AllowDrop="True">
     <Window.Styles>
         <Style Selector="Border.row">
             <Setter Property="Margin" Value="0,0,0,6"/>
@@ -142,6 +143,16 @@
                             <Button x:Name="AwakeOnBtn" Content="On"
                                     ToolTip.Tip="Selected headsets stay on when taken off (Wi-Fi ADB and kiosk keep working)"/>
                             <Button x:Name="AwakeOffBtn" Content="Off"/>
+                        </StackPanel>
+                        <Border Height="1" Background="#FF2A2C3E" Margin="0,4"/>
+                        <TextBlock Classes="muted" TextWrapping="Wrap"
+                                   Text="Install APKs (with OBB data) on every selected headset at once — or drop files on this window."/>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <Button x:Name="InstallApkBtn" Classes="launch" Content="Install APK…"
+                                    ToolTip.Tip="Choose APK files and install them on all selected headsets in parallel"/>
+                            <Button x:Name="InstallFolderBtn" Classes="launch" Content="Install folder…"
+                                    ToolTip.Tip="Choose a folder with APK (and OBB) files and install them on all selected headsets"/>
+                            <Button x:Name="CancelInstallBtn" Classes="stop" Content="Cancel install" IsVisible="False"/>
                         </StackPanel>
                     </StackPanel>
 

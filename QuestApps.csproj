@@ -4,7 +4,7 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ApplicationIcon>app.ico</ApplicationIcon>
-    <Version>4.1.0</Version>
+    <Version>4.2.0</Version>
     <Product>Quest Apps</Product>
   </PropertyGroup>
   <ItemGroup>

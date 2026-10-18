@@ -1,6 +1,6 @@
 <p align="center"><img src="icon256.png" width="128" height="128" alt="Quest Apps icon"></p>
 
-# Quest Apps 4.1
+# Quest Apps 4.2
 
 **[English](#english) · [Polski](#polski)**
 
@@ -10,11 +10,11 @@
 
 | Platform | File | Guide / Instrukcja |
 |---|---|---|
-| Windows 10/11 x64 | `QuestApps_4.1-windows-x64.zip` (adb included / adb w zestawie) | this file / ten plik |
-| macOS 12+ Apple Silicon | `QuestApps-4.1-macos-arm64.zip` | [README-multiplatform.md](README-multiplatform.md) |
-| macOS 12+ Intel | `QuestApps-4.1-macos-x64.zip` | [README-multiplatform.md](README-multiplatform.md) |
-| Linux x64 | `QuestApps-4.1-linux-x64.tar.gz` | [README-multiplatform.md](README-multiplatform.md) |
-| Linux ARM64 | `QuestApps-4.1-linux-arm64.tar.gz` | [README-multiplatform.md](README-multiplatform.md) |
+| Windows 10/11 x64 | `QuestApps_4.2-windows-x64.zip` (adb included / adb w zestawie) | this file / ten plik |
+| macOS 12+ Apple Silicon | `QuestApps-4.2-macos-arm64.zip` | [README-multiplatform.md](README-multiplatform.md) |
+| macOS 12+ Intel | `QuestApps-4.2-macos-x64.zip` | [README-multiplatform.md](README-multiplatform.md) |
+| Linux x64 | `QuestApps-4.2-linux-x64.tar.gz` | [README-multiplatform.md](README-multiplatform.md) |
+| Linux ARM64 | `QuestApps-4.2-linux-arm64.tar.gz` | [README-multiplatform.md](README-multiplatform.md) |
 
 Each package includes its own guide. / Każda paczka zawiera własną instrukcję.
 
@@ -34,7 +34,7 @@ Quest Apps is a Windows tool for Meta Quest headsets (tested on Quest 3). It tal
 - install APKs (with OBB game data) by drag & drop,
 - launch and stop apps from the PC,
 - **lock** an app (kiosk mode) so it cannot be left,
-- control **many headsets at once**: launch, lock and unlock the same app on all of them.
+- control **many headsets at once**: install APKs, and launch, lock and unlock the same app on all of them.
 
 ### 1. Requirements
 
@@ -138,6 +138,8 @@ Limitations:
 | **Stop** | Unlocks and closes the app. |
 | **Keep awake On / Off** | Headsets stay on when taken off, or sleep normally. |
 
+**Installing on many headsets:** press **Install APK…** or **Install folder…** (or drop APK files and game folders on the window). The app shows what it found and on which headsets, and after you confirm it installs everything **on all selected headsets in parallel**, including OBB game data. Progress is shown next to each headset. All permissions the apps ask for are granted. A headset that already has a newer version, or a copy signed with a different key, is skipped with a note; downgrade or replace that one from the main window. **Cancel install** stops all uploads.
+
 The result for each headset (with the time) appears next to it, and a summary appears at the top, for example *"done on 3 headset(s), 1 skipped"*.
 
 Locks are shared between both windows: a headset locked here shows **Unlock** in the main window too, and the other way round.
@@ -177,7 +179,7 @@ Quest Apps to program na Windows do gogli Meta Quest (testowany na Quest 3). Ł�
 - instalować APK (razem z danymi gier OBB) przez przeciągnięcie,
 - uruchamiać i zamykać aplikacje z komputera,
 - **blokować** aplikację (tryb kiosku), tak żeby nie dało się z niej wyjść,
-- sterować **wieloma goglami naraz**: uruchamiać, blokować i odblokowywać tę samą aplikację na wszystkich.
+- sterować **wieloma goglami naraz**: instalować APK oraz uruchamiać, blokować i odblokowywać tę samą aplikację na wszystkich.
 
 ### 1. Wymagania
 
@@ -280,6 +282,8 @@ Ograniczenia:
 | **Unlock** | Wyłącza kiosk. |
 | **Stop** | Odblokowuje i zamyka aplikację. |
 | **Keep awake On / Off** | Gogle nie zasypiają po zdjęciu z głowy albo zasypiają normalnie. |
+
+**Instalacja na wielu goglach:** naciśnij **Install APK…** albo **Install folder…** (albo przeciągnij pliki APK i foldery gier na okno). Program pokaże, co znalazł i na których goglach zainstaluje, a po potwierdzeniu instaluje wszystko **na wszystkich zaznaczonych goglach naraz**, razem z danymi OBB. Postęp widać przy każdych goglach. Aplikacje dostają wszystkie uprawnienia, o które proszą. Gogle, które mają już nowszą wersję albo kopię podpisaną innym kluczem, są pomijane z komentarzem; taką instalację zrób w głównym oknie. **Cancel install** przerywa wszystkie wysyłki.
 
 Wynik dla każdych gogli (z godziną) pojawia się przy nich, a podsumowanie na górze, np. *„done on 3 headset(s), 1 skipped”*.
 
