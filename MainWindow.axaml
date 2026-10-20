@@ -334,10 +334,25 @@
                                                              Value="{Binding Progress}"
                                                              IsIndeterminate="{Binding IsIndeterminate}"/>
                                             </StackPanel>
-                                            <Button Grid.Column="2" Classes="ghost" Content="Remove"
-                                                    VerticalAlignment="Center" Margin="10,0,0,0"
-                                                    IsEnabled="{Binding CanRemove}"
-                                                    Click="OnRemoveQueuedClick"/>
+                                            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8"
+                                                        VerticalAlignment="Center" Margin="10,0,0,0">
+                                                <TextBlock Text="{Binding RunStateText}" FontSize="11"
+                                                           Foreground="#FF57D98A" VerticalAlignment="Center"/>
+                                                <Button Classes="launch" Content="Launch"
+                                                        IsVisible="{Binding CanLaunch}"
+                                                        Click="OnLaunchClick"/>
+                                                <Button Classes="launch" Content="Stop"
+                                                        IsVisible="{Binding CanStop}"
+                                                        ToolTip.Tip="Force-stop the app"
+                                                        Click="OnStopClick"/>
+                                                <Button Classes="ghost" Content="Install again"
+                                                        IsVisible="{Binding IsInstalled}"
+                                                        ToolTip.Tip="Install the same APK (and OBB) once more"
+                                                        Click="OnInstallAgainClick"/>
+                                                <Button Classes="ghost" Content="Remove"
+                                                        IsEnabled="{Binding CanRemove}"
+                                                        Click="OnRemoveQueuedClick"/>
+                                            </StackPanel>
                                         </Grid>
                                     </Border>
                                 </DataTemplate>

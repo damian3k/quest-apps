@@ -1,4 +1,4 @@
-# Quest Apps 4.2
+# Quest Apps 4.3
 
 **[English](#english) · [Polski](#polski)**
 
@@ -29,8 +29,8 @@ Quest Apps is a desktop tool (Windows, macOS, Linux) for Meta Quest headsets (te
 #### Installing on macOS
 
 1. Unzip the right file:
-   - `QuestApps-4.2-macos-arm64.zip` for Apple Silicon (M1–M4),
-   - `QuestApps-4.2-macos-x64.zip` for Intel Macs.
+   - `QuestApps-4.3-macos-arm64.zip` for Apple Silicon (M1–M4),
+   - `QuestApps-4.3-macos-x64.zip` for Intel Macs.
 2. Move `QuestApps.app` to **Applications**.
 3. Install adb with Homebrew: `brew install --cask android-platform-tools`. Android Studio's adb works too.
 4. The app is not signed by an Apple developer, so before the **first** start run this once in Terminal. The second line is required on Apple Silicon; without it the app is closed straight away.
@@ -42,7 +42,7 @@ Quest Apps is a desktop tool (Windows, macOS, Linux) for Meta Quest headsets (te
 
 #### Installing on Linux
 
-1. Unpack: `tar xzf QuestApps-4.2-linux-x64.tar.gz` (the `-linux-arm64` file is for ARM boards).
+1. Unpack: `tar xzf QuestApps-4.3-linux-x64.tar.gz` (the `-linux-arm64` file is for ARM boards).
 2. Install adb:
    - Debian/Ubuntu: `sudo apt install adb`
    - Fedora: `sudo dnf install android-tools`
@@ -108,6 +108,7 @@ The headset is now remembered: its name, model and Wi-Fi address are saved on th
   2. OBB game data is found automatically: a folder named after the package, or `main.*.<package>.obb` files next to the APK. It is copied to `/sdcard/Android/obb/<package>/`.
   3. Each entry shows whether it is a **new app** or an **update** of an installed version.
   4. Press **Install**. Progress and speed are shown for each app. **Cancel** stops the queue.
+     When an app is installed, its row gets **Launch** (it turns into **Stop** while the app runs, to close it) and **Install again**, which installs the same APK (and OBB) once more, for example after an uninstall.
   5. **Grant all permissions** gives the app every permission it asks for, so the headset does not ask later.
   6. Two cases ask before going ahead:
      - the APK is signed with a different key than the installed version → *Uninstall & install* (the app's saved data is lost);
@@ -210,8 +211,8 @@ Quest Apps to program na komputer (Windows, macOS, Linux) do gogli Meta Quest (t
 #### Instalacja na macOS
 
 1. Rozpakuj właściwy plik:
-   - `QuestApps-4.2-macos-arm64.zip` dla Apple Silicon (M1–M4),
-   - `QuestApps-4.2-macos-x64.zip` dla Maców z procesorem Intel.
+   - `QuestApps-4.3-macos-arm64.zip` dla Apple Silicon (M1–M4),
+   - `QuestApps-4.3-macos-x64.zip` dla Maców z procesorem Intel.
 2. Przenieś `QuestApps.app` do **Aplikacji**.
 3. Zainstaluj adb przez Homebrew: `brew install --cask android-platform-tools`. Działa też adb z Android Studio.
 4. Aplikacja nie jest podpisana przez dewelopera Apple, więc przed **pierwszym** uruchomieniem wpisz raz w Terminalu poniższe polecenia. Druga linia jest wymagana na Apple Silicon; bez niej aplikacja od razu się zamyka.
@@ -223,7 +224,7 @@ Quest Apps to program na komputer (Windows, macOS, Linux) do gogli Meta Quest (t
 
 #### Instalacja na Linuksie
 
-1. Rozpakuj: `tar xzf QuestApps-4.2-linux-x64.tar.gz` (plik `-linux-arm64` jest dla płytek ARM).
+1. Rozpakuj: `tar xzf QuestApps-4.3-linux-x64.tar.gz` (plik `-linux-arm64` jest dla płytek ARM).
 2. Zainstaluj adb:
    - Debian/Ubuntu: `sudo apt install adb`
    - Fedora: `sudo dnf install android-tools`
@@ -289,6 +290,7 @@ Gogle są teraz zapamiętane: ich nazwa, model i adres Wi-Fi są zapisane na kom
   2. Dane gier OBB są wykrywane automatycznie: folder o nazwie pakietu albo pliki `main.*.<pakiet>.obb` obok APK. Trafiają do `/sdcard/Android/obb/<pakiet>/`.
   3. Każda pozycja pokazuje, czy to **nowa aplikacja**, czy **aktualizacja** zainstalowanej wersji.
   4. Naciśnij **Install**. Przy każdej aplikacji widać postęp i prędkość. **Cancel** zatrzymuje kolejkę.
+     Przy zainstalowanej aplikacji pojawiają się **Launch** (gdy aplikacja działa, zmienia się w **Stop**, żeby ją zamknąć) oraz **Install again**, które instaluje ten sam APK (i OBB) jeszcze raz, np. po odinstalowaniu.
   5. **Grant all permissions** nadaje aplikacji wszystkie uprawnienia, o które prosi, więc gogle nie pytają o nie później.
   6. W dwóch przypadkach program pyta przed kontynuacją:
      - APK jest podpisane innym kluczem niż zainstalowana wersja → *Uninstall & install* (zapisane dane aplikacji przepadną);

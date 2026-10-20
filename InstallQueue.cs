@@ -79,11 +79,50 @@ public sealed class InstallItem : INotifyPropertyChanged
             Raise(nameof(State));
             Raise(nameof(IsBusy));
             Raise(nameof(CanRemove));
+            RaiseRunState();
         }
     }
 
     public bool IsBusy => State == InstallState.Running;
     public bool CanRemove => State != InstallState.Running;
+
+    // once installed: Launch (turns into Stop while the app runs) and Install again
+    private bool _isRunning;
+    public bool IsRunning
+    {
+        get => _isRunning;
+        set
+        {
+            if (_isRunning == value) return;
+            _isRunning = value;
+            RaiseRunState();
+        }
+    }
+
+    private bool _isLocked;
+    public bool IsLocked
+    {
+        get => _isLocked;
+        set
+        {
+            if (_isLocked == value) return;
+            _isLocked = value;
+            RaiseRunState();
+        }
+    }
+
+    public bool IsInstalled => State == InstallState.Done && Package != null;
+    public bool CanLaunch => IsInstalled && !IsRunning;
+    public bool CanStop => IsInstalled && IsRunning && !IsLocked;
+    public string RunStateText => !IsInstalled ? "" : IsLocked ? "🔒 locked" : IsRunning ? "● running" : "";
+
+    private void RaiseRunState()
+    {
+        Raise(nameof(IsInstalled));
+        Raise(nameof(CanLaunch));
+        Raise(nameof(CanStop));
+        Raise(nameof(RunStateText));
+    }
 
     private string _statusText = "Waiting";
     public string StatusText

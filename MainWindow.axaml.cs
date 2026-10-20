@@ -563,7 +563,20 @@ public partial class MainWindow : Window
             app.IsRunning = _running.Contains(app.Package);
             app.IsLocked = app.Package == _lockedPackage;
         }
+        foreach (var item in _queue)
+        {
+            item.IsRunning = item.Package != null && _running.Contains(item.Package);
+            item.IsLocked = item.Package != null && item.Package == _lockedPackage;
+        }
     }
+
+    // Launch / Stop work on rows of the app lists and on installed rows of the install queue.
+    private static (string Package, string Name)? RunTarget(object? dataContext) => dataContext switch
+    {
+        QuestApp app => (app.Package, app.DisplayName),
+        InstallItem { Package: { } package } item => (package, item.DisplayName),
+        _ => null,
+    };
 
     private string AppName(string package) =>
         _apps.FirstOrDefault(a => a.Package == package)?.DisplayName ?? package;
@@ -572,29 +585,29 @@ public partial class MainWindow : Window
 
     private async void OnLaunchClick(object? sender, RoutedEventArgs e)
     {
-        if (sender is not Button { DataContext: QuestApp app } button)
+        if (sender is not Button button || RunTarget(button.DataContext) is not var (package, name))
             return;
         button.IsEnabled = false;
         try
         {
             if (await EnsureConnectedAsync() == null)
                 return;
-            SetStatus($"Starting {app.DisplayName}…", InfoBrush);
-            var error = await Task.Run(() => _adb.Launch(app.Package));
+            SetStatus($"Starting {name}…", InfoBrush);
+            var error = await Task.Run(() => _adb.Launch(package));
             if (error != null)
             {
-                SetStatus($"Could not start {app.DisplayName}: {error}", ErrBrush);
+                SetStatus($"Could not start {name}: {error}", ErrBrush);
                 return;
             }
             // VR apps take a moment to create their process and window
-            for (int i = 0; i < 6 && !app.IsRunning; i++)
+            for (int i = 0; i < 6 && !_running.Contains(package); i++)
             {
                 await Task.Delay(700);
                 await RefreshRunningAsync();
             }
-            SetStatus(app.IsRunning
-                ? $"{app.DisplayName} is running — put the headset on. Use Lock for kiosk mode."
-                : $"Started {app.DisplayName} — put the headset on.", OkBrush);
+            SetStatus(_running.Contains(package)
+                ? $"{name} is running — put the headset on. Use Lock for kiosk mode."
+                : $"Started {name} — put the headset on.", OkBrush);
         }
         catch (Exception ex)
         {
@@ -608,17 +621,17 @@ public partial class MainWindow : Window
 
     private async void OnStopClick(object? sender, RoutedEventArgs e)
     {
-        if (sender is not Button { DataContext: QuestApp app } button)
+        if (sender is not Button button || RunTarget(button.DataContext) is not var (package, name))
             return;
         button.IsEnabled = false;
         try
         {
             if (await EnsureConnectedAsync() == null)
                 return;
-            await Task.Run(() => _adb.ForceStop(app.Package));
+            await Task.Run(() => _adb.ForceStop(package));
             await RefreshRunningAsync();
-            SetStatus(app.IsRunning ? $"{app.DisplayName} is still running." : $"Stopped {app.DisplayName}.",
-                app.IsRunning ? WarnBrush : OkBrush);
+            bool still = _running.Contains(package);
+            SetStatus(still ? $"{name} is still running." : $"Stopped {name}.", still ? WarnBrush : OkBrush);
         }
         catch (Exception ex)
         {
@@ -1025,6 +1038,19 @@ public partial class MainWindow : Window
             _queue.Remove(item);
     }
 
+    // Installs the same APK (and OBB) once more — just this row, not the rest of the queue.
+    private async void OnInstallAgainClick(object? sender, RoutedEventArgs e)
+    {
+        if (sender is not Control { DataContext: InstallItem { IsInstalled: true } item })
+            return;
+        if (_installCts != null)
+        {
+            SetStatus("An install is running — wait for it to finish.", WarnBrush);
+            return;
+        }
+        await InstallQueueAsync(only: item);
+    }
+
     // "new app" vs "update — installed v1.2", based on the last device scan.
     private void UpdateExistingLabels()
     {
@@ -1063,7 +1089,7 @@ public partial class MainWindow : Window
                             (done > 0 ? $" • {done} installed" : "");
     }
 
-    private async Task InstallQueueAsync()
+    private async Task InstallQueueAsync(InstallItem? only = null)
     {
         if (_installCts != null)
             return;
@@ -1077,7 +1103,9 @@ public partial class MainWindow : Window
         RefreshBtn.IsEnabled = false;
         int ok = 0, failed = 0;
 
-        var batch = _queue.Where(i => i.State is InstallState.Waiting or InstallState.Failed or InstallState.Canceled).ToList();
+        var batch = only != null
+            ? new List<InstallItem> { only }
+            : _queue.Where(i => i.State is InstallState.Waiting or InstallState.Failed or InstallState.Canceled).ToList();
         foreach (var item in batch)
             item.SetWaiting();
         UpdateQueueUi();
